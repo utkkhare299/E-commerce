@@ -1,50 +1,54 @@
-import { useState, createContext } from 'react';
+import { useState, createContext } from "react";
 
-export const CartContext = createContext()
+export const CartContext = createContext();
 
 const CartProvider = (props) => {
-
-  const [cartItems, setcartItems] = useState([])
-  const [quantity, setQuantity] = useState(0)
-
+  const [cartItems, setcartItems] = useState([]);
+  const [quantity, setQuantity] = useState(0);
+  const [token, setToken] = useState(localStorage.getItem("token"));
+  const loginHandler = (token) => {
+    setToken(token);
+    localStorage.setItem("token", token);
+  };
   const addItemToCartHandler = (product, quantity) => {
-
-    setQuantity( prevQty => prevQty + quantity)
+    setQuantity((prevQty) => prevQty + quantity);
     const checkProductInCart = cartItems.find((item) => item.id === product.id);
 
-    if(checkProductInCart) {
-      const updatedcartItems = cartItems.map(item => {
-        if(item.id === product.id) return {
+    if (checkProductInCart) {
+      const updatedcartItems = cartItems.map((item) => {
+        if (item.id === product.id)
+          return {
             ...item,
-            quantity: item.quantity + quantity
-          }
-        })
+            quantity: item.quantity + quantity,
+          };
+      });
       setcartItems(updatedcartItems);
     } else {
-      product.quantity = quantity
-      setcartItems([...cartItems, product ]);
+      product.quantity = quantity;
+      setcartItems([...cartItems, product]);
     }
   };
 
-  const removeItemFromCartHandler = (id) => {
-    const newcartItems = cartItems.filter(item => item.id !== id);
-    let foundItem = cartItems.find((item) => item.id === id);
+  // const removeItemFromCartHandler = (id) => {
+  //   const newcartItems = cartItems.filter(item => item.id !== id);
+  //   let foundItem = cartItems.find((item) => item.id === id);
 
-    if (quantity > 0) setQuantity(prevQty => prevQty - 1)
-    if (foundItem.quantity > 1) {
-      setcartItems([...newcartItems, { ...foundItem, quantity: foundItem.quantity - 1 } ])
-    } else {
+  //   if (quantity > 0) setQuantity(prevQty => prevQty - 1)
+  //   if (foundItem.quantity > 1) {
+  //     setcartItems([...newcartItems, { ...foundItem, quantity: foundItem.quantity - 1 } ])
+  //   } else {
 
-      setcartItems(newcartItems);
-    }
+  //     setcartItems(newcartItems);
+  //   }
 
-  };
+  // };
 
   const cartContext = {
     cartItems,
     totalAmount: 0,
     totalQty: quantity,
     addItem: addItemToCartHandler,
+    login: loginHandler,
     // removeItem: removeItemFromCartHandler,
   };
 
